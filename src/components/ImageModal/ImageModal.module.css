@@ -1,0 +1,23 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: rgba(26, 137, 1, 0.5);
+    z-index: 999;
+}
+
+.modalContent {
+    filter: drop-shadow(0 0 10px rgb(98, 255, 0));
+}
+
+.modalInfo {
+    color: #fff;
+    background-color: rgba(4, 253, 232, 0.288);
+    padding: 0 12px;
+}
