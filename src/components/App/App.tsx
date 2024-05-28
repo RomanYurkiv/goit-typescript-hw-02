@@ -1,25 +1,38 @@
-import { useState, useEffect } from "react";
-import getImages from "../../imagesAPI";
+import React, { useState, useEffect } from "react";
+import getImages from "./imagesAPI";
+import toast, { Toaster } from "react-hot-toast";
+import css from "./App.module.css";
 import SearchBar from "../SearchBar/SearchBar";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import ImageGallery from "../ImageGallery/ImageGallery";
 import ImageModal from "../ImageModal/ImageModal";
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
-import Loader from "../Loader/Loader";
-import ErrorMessage from "../ErrorMessage/ErrorMessage";
-import toast, { Toaster } from "react-hot-toast";
-import css from "./App.module.css";
 
-const App = () => {
-  const [images, setImages] = useState([]);
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(false);
-  const [hasMore, setHasMore] = useState(0);
+interface Image {
+  id: string;
+  urls: {
+    regular: string;
+    small: string;
+  };
+  alt_description: string;
+}
 
-  async function searchImages(inputValue) {
-    setQuery(`${Date.now()}/${inputValue}`);
+const App: React.FC = () => {
+  const [images, setImages] = useState<Image[]>([]);
+  const [query, setQuery] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<{
+    isModalOpen: boolean;
+    bigImage: string;
+    imageDescription: string;
+  } | null>(null);
+  const [hasMore, setHasMore] = useState<number>(0);
+
+  async function searchImages(inputValue: string) {
+    setQuery(inputValue);
     setImages([]);
     setPage(1);
   }
@@ -55,7 +68,11 @@ const App = () => {
     setPage(page + 1);
   }
 
-  const openModal = (image) => {
+  const openModal = (image: {
+    isModalOpen: boolean;
+    bigImage: string;
+    imageDescription: string;
+  }) => {
     setSelectedImage(image);
   };
 
@@ -70,7 +87,7 @@ const App = () => {
       {loading ? (
         <Loader />
       ) : error ? (
-        <ErrorMessage message={error.message} />
+        <ErrorMessage />
       ) : (
         <>
           <ImageGallery images={images} openModal={openModal} />
