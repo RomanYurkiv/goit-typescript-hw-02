@@ -1,8 +1,9 @@
-import React from "react";
 import Modal from "react-modal";
 import css from "./ImageModal.module.css";
+import { Image } from "../App/App.types";
 
 interface ImageModalProps {
+  image: Image;
   isOpen: boolean;
   bigImage: string;
   imageDescription: string;

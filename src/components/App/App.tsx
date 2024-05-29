@@ -1,38 +1,30 @@
-import React, { useState, useEffect } from "react";
-import getImages from "./imagesAPI";
-import toast, { Toaster } from "react-hot-toast";
-import css from "./App.module.css";
+import { useState, useEffect } from "react";
+import { AxiosResponse } from "axios";
+import Modal from "react-modal";
+import getImages from "../../imagesAPI";
 import SearchBar from "../SearchBar/SearchBar";
-import Loader from "../Loader/Loader";
-import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import ImageGallery from "../ImageGallery/ImageGallery";
 import ImageModal from "../ImageModal/ImageModal";
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import toast, { Toaster } from "react-hot-toast";
+import css from "./App.module.css";
+import { Image, AppProps, ImageResponse } from "./App.types";
 
-interface Image {
-  id: string;
-  urls: {
-    regular: string;
-    small: string;
-  };
-  alt_description: string;
-}
+Modal.setAppElement("#root");
 
-const App: React.FC = () => {
+const App: React.FC<AppProps> = () => {
   const [images, setImages] = useState<Image[]>([]);
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
-  const [selectedImage, setSelectedImage] = useState<{
-    isModalOpen: boolean;
-    bigImage: string;
-    imageDescription: string;
-  } | null>(null);
+  const [error, setError] = useState<{ message: string } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [hasMore, setHasMore] = useState<number>(0);
 
-  async function searchImages(inputValue: string) {
-    setQuery(inputValue);
+  async function searchImages(inputValue: string): Promise<void> {
+    setQuery(`${Date.now()}/${inputValue}`);
     setImages([]);
     setPage(1);
   }
@@ -42,12 +34,15 @@ const App: React.FC = () => {
       return;
     }
 
-    async function fetchImages() {
+    async function fetchImages(): Promise<void> {
       try {
         setLoading(true);
-        setError(false);
-        const response = await getImages(query, page);
-        const data = response.data;
+        setError(null);
+        const response: AxiosResponse<ImageResponse> = await getImages(
+          query,
+          page
+        );
+        const data: ImageResponse = response.data;
         if (!data.results.length) {
           toast.error("Oops, something went wrong. Give it another shot.", {
             position: "top-right",
@@ -56,7 +51,7 @@ const App: React.FC = () => {
         setImages((prevImages) => [...prevImages, ...data.results]);
         setHasMore(data.total_pages);
       } catch (error) {
-        setError(true);
+        setError({ message: (error as Error).message });
       } finally {
         setLoading(false);
       }
@@ -64,19 +59,15 @@ const App: React.FC = () => {
     fetchImages();
   }, [query, page]);
 
-  function handleLoadMore() {
+  function handleLoadMore(): void {
     setPage(page + 1);
   }
 
-  const openModal = (image: {
-    isModalOpen: boolean;
-    bigImage: string;
-    imageDescription: string;
-  }) => {
+  const openModal = (image: Image): void => {
     setSelectedImage(image);
   };
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     setSelectedImage(null);
   };
 
@@ -87,16 +78,17 @@ const App: React.FC = () => {
       {loading ? (
         <Loader />
       ) : error ? (
-        <ErrorMessage />
+        <ErrorMessage message={error.message} />
       ) : (
         <>
           <ImageGallery images={images} openModal={openModal} />
           {selectedImage && (
             <ImageModal
-              isOpen={selectedImage.isModalOpen}
-              bigImage={selectedImage.bigImage}
-              imageDescription={selectedImage.imageDescription}
+              isOpen={selectedImage !== null}
+              imageDescription={selectedImage?.description ?? ""}
               onClose={closeModal}
+              image={selectedImage}
+              bigImage={selectedImage.bigImage}
             />
           )}
           {images.length > 0 && !loading && hasMore > page && (
