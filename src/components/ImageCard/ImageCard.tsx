@@ -1,11 +1,12 @@
 import React from "react";
 
 interface Image {
+  id: string;
   urls: {
     regular: string;
     small: string;
   };
-  alt_description: string;
+  alt_description: string | null;
 }
 
 interface ImageCardProps {
@@ -24,11 +25,11 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onOpen }) => (
         onOpen({
           isModalOpen: true,
           bigImage: image.urls.regular,
-          imageDescription: image.alt_description,
+          imageDescription: image.alt_description || "",
         })
       }
       src={image.urls.small}
-      alt={image.alt_description}
+      alt={image.alt_description || "Image"}
     />
   </div>
 );

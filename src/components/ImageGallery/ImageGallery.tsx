@@ -1,33 +1,43 @@
-import ImageCard from "../ImageCard/ImageCard";
+import React from "react";
 import css from "./ImageGallery.module.css";
-import { Image } from "../App/App.types";
+import ImageCard from "../ImageCard/ImageCard";
 
-type ImageGalleryProps = {
-  images: Image[];
-  openModal: (image: Image) => void;
-};
+interface AppImage {
+  id: string;
+  urls: {
+    full: string;
+    thumb: string;
+  };
+  alt_description: string | null;
+}
+
+interface ImageGalleryProps {
+  images: AppImage[];
+  openModal: (data: {
+    isModalOpen: boolean;
+    bigImage: string;
+    imageDescription: string;
+  }) => void;
+}
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, openModal }) => (
   <ul className={css.galleryList}>
     {images.map((image) => (
       <li className={css.galleryListItem} key={image.id}>
         <ImageCard
-          image={image}
+          image={{
+            id: image.id,
+            urls: {
+              regular: image.urls.full,
+              small: image.urls.thumb,
+            },
+            alt_description: image.alt_description || "",
+          }}
           onOpen={() =>
             openModal({
-              bigImage: image.urls.regular,
-              description: image.description ?? "",
-              id: "",
-              urls: {
-                regular: "",
-                small: "",
-                big: "",
-              },
-              alt_description: "",
-              isOpen: false,
-              onClose: function (): void {
-                throw new Error("Function not implemented.");
-              },
+              isModalOpen: true,
+              bigImage: image.urls.full,
+              imageDescription: image.alt_description || "",
             })
           }
         />

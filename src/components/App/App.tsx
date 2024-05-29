@@ -20,11 +20,15 @@ const App: React.FC<AppProps> = () => {
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<{ message: string } | null>(null);
-  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
+  const [selectedImage, setSelectedImage] = useState<{
+    isModalOpen: boolean;
+    bigImage: string;
+    imageDescription: string;
+  } | null>(null);
   const [hasMore, setHasMore] = useState<number>(0);
 
   async function searchImages(inputValue: string): Promise<void> {
-    setQuery(`${Date.now()}/${inputValue}`);
+    setQuery(inputValue);
     setImages([]);
     setPage(1);
   }
@@ -63,8 +67,12 @@ const App: React.FC<AppProps> = () => {
     setPage(page + 1);
   }
 
-  const openModal = (image: Image): void => {
-    setSelectedImage(image);
+  const openModal = (data: {
+    isModalOpen: boolean;
+    bigImage: string;
+    imageDescription: string;
+  }): void => {
+    setSelectedImage(data);
   };
 
   const closeModal = (): void => {
@@ -84,10 +92,9 @@ const App: React.FC<AppProps> = () => {
           <ImageGallery images={images} openModal={openModal} />
           {selectedImage && (
             <ImageModal
-              isOpen={selectedImage !== null}
-              imageDescription={selectedImage?.description ?? ""}
+              isOpen={selectedImage.isModalOpen}
+              imageDescription={selectedImage.imageDescription}
               onClose={closeModal}
-              image={selectedImage}
               bigImage={selectedImage.bigImage}
             />
           )}

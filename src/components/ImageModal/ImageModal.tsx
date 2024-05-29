@@ -1,9 +1,8 @@
+import React from "react";
 import Modal from "react-modal";
 import css from "./ImageModal.module.css";
-import { Image } from "../App/App.types";
 
 interface ImageModalProps {
-  image: Image;
   isOpen: boolean;
   bigImage: string;
   imageDescription: string;
@@ -16,18 +15,12 @@ const ImageModal: React.FC<ImageModalProps> = ({
   imageDescription,
   onClose,
 }) => (
-  <Modal
-    isOpen={isOpen}
-    onRequestClose={onClose}
-    className={css.modalContent}
-    overlayClassName={css.modalOverlay}
-  >
-    <div>
-      <img src={bigImage} alt={imageDescription} />
-      <div className={css.modalInfo}>
-        <p>{imageDescription}</p>
-      </div>
-    </div>
+  <Modal isOpen={isOpen} onRequestClose={onClose} className={css.modal}>
+    <button onClick={onClose} className={css.closeButton}>
+      Close
+    </button>
+    <img src={bigImage} alt={imageDescription} className={css.image} />
+    <p>{imageDescription}</p>
   </Modal>
 );
 

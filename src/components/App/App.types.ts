@@ -1,24 +1,21 @@
+
 export interface Image {
   id: string;
   urls: {
-    regular: string;
-    small: string;
-    big: string;
+    full: string;
+    thumb: string;
+    regular?: string;
+    small?: string;
   };
-  bigImage: string;
-  description: string;
-  alt_description: string;
-  isOpen: boolean;
-  onClose: () => void;
+  alt_description: string | null;
+  description: string | null;
+  bigImage?: string;
 }
 
-export interface AppProps {
-  onSearch: (inputValue: string) => Promise<void>;
-  images: Image[];
-}
-
-export type ImageResponse = {
+export interface ImageResponse {
   total: number;
   total_pages: number;
   results: Image[];
-};
+}
+
+export interface AppProps {}
